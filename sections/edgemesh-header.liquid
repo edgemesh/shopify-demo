@@ -5,12 +5,15 @@
 <header class="em-header">
   <div class="em-container em-header-inner">
     <a href="{{ routes.root_url }}" class="em-logo" aria-label="Edgemesh home">
-      <img src="{{ 'edgemesh-wordmark.png' | asset_url }}" width="180" height="23" alt="Edgemesh" loading="eager">
+      <picture>
+        <source media="(max-width: 600px)" srcset="{{ 'edgemesh-brand-icon.svg' | asset_url }}" width="857" height="750">
+        <img src="{{ 'edgemesh-wordmark.png' | asset_url }}" width="180" height="23" alt="Edgemesh" loading="eager">
+      </picture>
     </a>
     <nav class="em-nav" aria-label="Main navigation">
       <a href="{{ routes.root_url }}#stack">Explore the stack</a>
       <a href="{{ routes.root_url }}#dynamic-content">How this demo works</a>
-      <a href="https://edgemesh.com" target="_blank" rel="noopener">Edgemesh.com <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-up-right' %}</span></a>
+      <a href="https://edgemesh.com" target="_blank" rel="noopener">edgemesh.com <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-up-right' %}</span></a>
     </nav>
     <div class="em-cart-action">
       <span class="em-fragment-label">DYNAMIC FRAGMENT</span>
@@ -22,7 +25,7 @@
       <nav aria-label="Mobile navigation">
         <a href="{{ routes.root_url }}#stack">Explore the stack</a>
         <a href="{{ routes.root_url }}#dynamic-content">How this demo works</a>
-        <a href="https://edgemesh.com">Edgemesh.com {% render 'edgemesh-icon', name: 'arrow-up-right' %}</a>
+        <a href="https://edgemesh.com">edgemesh.com {% render 'edgemesh-icon', name: 'arrow-up-right' %}</a>
       </nav>
     </details>
   </div>
