@@ -1,0 +1,32 @@
+<section class="em-hero" aria-labelledby="em-hero-title">
+  <div class="em-container em-hero-grid">
+    <div class="em-hero-copy">
+      <p class="em-eyebrow"><span class="em-dot"></span> THE GROWTH STACK, IN ACTION</p>
+      <h1 id="em-hero-title">Safer.<br>Faster.<br><span>Smarter.</span></h1>
+      <p class="em-lead">A single, unified platform to accelerate ecommerce growth.</p>
+      <div class="em-hero-actions"><a class="em-button" href="#stack">Explore the stack <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-down' %}</span></a><a class="em-text-link" href="#dynamic-content">See how it works <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-up-right' %}</span></a></div>
+      <p class="em-hero-note">Real products. A real Shopify cart. Edgemesh under the hood.</p>
+    </div>
+    <div class="em-hero-visual">
+      <div class="em-window-bar"><span><i></i><i></i><i></i></span><span>EDGEMESH / CACHE ENGINE</span><span aria-hidden="true"></span></div>
+      <div class="em-dashboard-frame">
+        <img
+          src="{{ 'edgemesh-dashboard-1800.webp' | asset_url }}"
+          srcset="{{ 'edgemesh-dashboard-900.webp' | asset_url }} 900w, {{ 'edgemesh-dashboard-1800.webp' | asset_url }} 1800w"
+          sizes="(max-width: 600px) calc(100vw - 45px), (max-width: 1100px) 54vw, 685px"
+          alt="Edgemesh dashboard showing request volume, cache status, and cache and business performance"
+          width="1800"
+          height="1000"
+          loading="eager"
+          fetchpriority="high"
+        >
+      </div>
+      <div class="em-hero-caption"><span class="em-dot"></span> FIRST-PARTY DATA. FULL-STACK IMPACT.<span>01 — 04</span></div>
+      <div class="em-hero-float"><span class="em-mini-icon">{% render 'edgemesh-icon', name: 'arrow-up-right' %}</span><div><strong>Built for your next stage.</strong><span>Security · Signal · Performance · Allocation</span></div></div>
+    </div>
+  </div>
+  <div class="em-hero-base em-container"><span>ONE PLATFORM. EVERY LAYER OF GROWTH.</span><span>Built on Shopify Horizon</span></div>
+</section>
+{% schema %}
+{"name":"Edgemesh hero","settings":[],"presets":[{"name":"Edgemesh hero"}]}
+{% endschema %}

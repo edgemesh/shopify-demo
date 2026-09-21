@@ -1,0 +1,13 @@
+{
+  "name": "edgemesh-shopify-demo-theme",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "shopify theme check && node --test tests/*.test.mjs",
+    "dev": "shopify theme dev --store edgemesh.myshopify.com",
+    "push": "shopify theme push --environment demo --strict",
+    "measure:liquid": "node scripts/measure-liquid.mjs",
+    "products:plan": "node scripts/seed-products.mjs",
+    "products:apply": "node scripts/seed-products.mjs --apply"
+  }
+}

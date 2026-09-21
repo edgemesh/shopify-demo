@@ -1,0 +1,13 @@
+{
+  "type": "header",
+  "name": "Edgemesh header",
+  "sections": {
+    "main": {
+      "type": "edgemesh-header",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

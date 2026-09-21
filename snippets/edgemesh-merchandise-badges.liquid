@@ -1,0 +1,19 @@
+{% doc %}
+  Apply availability, tag, and metafield merchandising rules.
+  @param {product} product - Product being merchandised.
+{% enddoc %}
+{%- liquid
+  assign normalized_tags = product.tags | join: ',' | downcase | split: ',' | uniq | sort
+  assign custom_badge = product.metafields.custom.badge.value
+-%}
+<ul class="em-merch-badges" aria-label="Product highlights">
+  <li>{% if product.available %}Available{% else %}Sold out{% endif %}</li>
+  {%- if custom_badge != blank -%}<li>{{ custom_badge | escape }}</li>{%- endif -%}
+  {%- for tag in normalized_tags limit: 24 -%}
+    {%- case tag -%}
+      {%- when 'bestseller' -%}<li>Bestseller</li>
+      {%- when 'new' -%}<li>New arrival</li>
+      {%- when 'edgemesh-demo' -%}<li>Demo product</li>
+    {%- endcase -%}
+  {%- endfor -%}
+</ul>

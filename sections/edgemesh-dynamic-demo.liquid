@@ -1,0 +1,29 @@
+<section class="em-dynamic-section" id="dynamic-content" aria-labelledby="em-dynamic-heading">
+  <div class="em-container">
+    <div class="em-section-heading">
+      <div><p class="em-eyebrow">UNDER THE HOOD</p><h2 id="em-dynamic-heading">A fast page.<br>Personal where it matters.</h2></div>
+      <p>Add a product. Change a quantity. Keep browsing.<br>Two ways to keep your cart current, without reloading the page.</p>
+    </div>
+    <div class="em-methods">
+      <article class="em-method">
+        <div class="em-method-top"><span class="em-method-number">{% render 'edgemesh-icon', name: 'panels-top-left' %} 01</span><span class="em-method-tag">SHOPIFY NATIVE</span></div>
+        <h3>The cart. Rendered in sections.</h3>
+        <p>Shopify returns fresh cart HTML with each add, remove, or quantity change. Horizon updates the drawer and totals using the Section Rendering API.</p>
+        <div class="em-code"><span>POST</span> /cart/add.js<br><span>sections</span> cart-drawer-section</div>
+        <div class="em-method-status"><i></i><span data-em-section-status>Ready for a cart interaction</span></div>
+      </article>
+      <article class="em-method">
+        <div class="em-method-top"><span class="em-method-number">{% render 'edgemesh-icon', name: 'layers' %} 02</span><span class="em-method-tag">EDGEMESH DYNAMIC</span></div>
+        <h3>The count. A personal fragment.</h3>
+        <p>The cart bubble is wrapped in a dynamic fragment. On the EdgeMesh domain, the rest of the page can be cached while this small region is refreshed for each shopper.</p>
+        <div class="em-code"><span>&lt;dynamic&gt;</span><br>&nbsp; {% raw %}{{ cart.item_count }}{% endraw %}<br><span>&lt;/dynamic&gt;</span></div>
+        <div class="em-method-status"><i></i><span data-em-fragment-status>Checking the delivery environment…</span></div>
+      </article>
+    </div>
+    <div class="em-demo-footnote"><span>TRY IT YOURSELF</span><p>The “Dynamic fragment” label points to the header count. Open your cart to see the section-rendered drawer.</p><a href="{{ routes.root_url }}#stack">Choose a product {% render 'edgemesh-icon', name: 'arrow-up' %}</a></div>
+    <noscript><p>Enable JavaScript to see live cart updates. Product forms and the cart page still work without it.</p></noscript>
+  </div>
+</section>
+{% schema %}
+{"name":"Dynamic content demo","settings":[],"presets":[{"name":"Dynamic content demo"}]}
+{% endschema %}

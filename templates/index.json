@@ -1,0 +1,62 @@
+{
+  "sections": {
+    "hero": {
+      "type": "edgemesh-hero",
+      "settings": {}
+    },
+    "stack": {
+      "type": "edgemesh-stack",
+      "blocks": {
+        "security": {
+          "type": "product",
+          "settings": {
+            "handle": "security"
+          }
+        },
+        "signal": {
+          "type": "product",
+          "settings": {
+            "handle": "signal"
+          }
+        },
+        "performance": {
+          "type": "product",
+          "settings": {
+            "handle": "performance"
+          }
+        },
+        "allocation": {
+          "type": "product",
+          "settings": {
+            "handle": "allocation"
+          }
+        }
+      },
+      "block_order": [
+        "security",
+        "signal",
+        "performance",
+        "allocation"
+      ],
+      "settings": {}
+    },
+    "dynamic": {
+      "type": "edgemesh-dynamic-demo",
+      "settings": {}
+    },
+    "liquid_workload": {
+      "type": "edgemesh-liquid-workload",
+      "settings": {
+        "enabled": true,
+        "passes": 16,
+        "slots": 48
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "stack",
+    "dynamic",
+    "liquid_workload"
+  ]
+}

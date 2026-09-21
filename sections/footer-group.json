@@ -1,0 +1,13 @@
+{
+  "type": "footer",
+  "name": "Edgemesh footer",
+  "sections": {
+    "main": {
+      "type": "edgemesh-footer",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

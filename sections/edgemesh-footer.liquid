@@ -1,0 +1,19 @@
+<div class="em-footer">
+  <div class="em-container">
+    <div class="em-footer-top">
+      <div>
+        <a href="{{ routes.root_url }}" aria-label="Edgemesh home"><img src="{{ 'edgemesh-wordmark.png' | asset_url }}" width="180" height="23" alt="Edgemesh" loading="lazy"></a>
+        <p>Stop guessing. Start knowing. Keep growing.</p>
+      </div>
+      <a class="em-button" href="https://cal.com/team/edgemesh/edgemesh-overview">Let’s talk about your store <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-up-right' %}</span></a>
+    </div>
+    <div class="em-footer-bottom">
+      <p>© {{ 'now' | date: '%Y' }} Edgemesh Corporation</p>
+      <span>A Shopify Horizon demo · Service prices shown for illustration</span>
+      <a href="https://docs.edgemesh.com">Documentation {% render 'edgemesh-icon', name: 'arrow-up-right' %}</a>
+    </div>
+  </div>
+</div>
+{% schema %}
+{"name":"Edgemesh footer","settings":[],"enabled_on":{"groups":["footer"]}}
+{% endschema %}

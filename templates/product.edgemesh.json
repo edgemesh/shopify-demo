@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "main": {
+      "type": "edgemesh-product",
+      "settings": {}
+    },
+    "dynamic": {
+      "type": "edgemesh-dynamic-demo",
+      "settings": {}
+    },
+    "liquid_workload": {
+      "type": "edgemesh-liquid-workload",
+      "settings": {
+        "enabled": true,
+        "passes": 16,
+        "slots": 48
+      }
+    }
+  },
+  "order": [
+    "main",
+    "dynamic",
+    "liquid_workload"
+  ]
+}

@@ -1,0 +1,3 @@
+[environments.demo]
+store = "edgemesh.myshopify.com"
+theme = "153508675674"

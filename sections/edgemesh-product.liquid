@@ -1,0 +1,36 @@
+{% liquid
+  assign handle = product.handle
+  assign form_id = 'em-product-form-' | append: section.id
+%}
+{% capture asset %}{% render 'edgemesh-product-copy', handle: handle, field: 'asset' %}{% endcapture %}
+{% assign asset = asset | strip %}
+{% capture image_alt %}{% render 'edgemesh-product-copy', handle: handle, field: 'imageAlt' %}{% endcapture %}
+<section class="em-product-page">
+  <div class="em-container">
+    <a class="em-breadcrumb" href="{{ routes.root_url }}#stack">{% render 'edgemesh-icon', name: 'arrow-left' %} The Edgemesh stack</a>
+    <div class="em-product-layout">
+      <div class="em-product-detail-art em-product-illustration">
+        {% if asset != blank %}
+          <img src="{{ asset | asset_url }}" width="1254" height="1254" alt="{{ image_alt | strip | escape }}" loading="eager" fetchpriority="high">
+        {% elsif product.featured_image %}
+          {{ product.featured_image | image_url: width: 1200 | image_tag: loading: 'eager' }}
+        {% endif %}
+        <span>EDGEMESH / {{ product.title | upcase | escape }}</span>
+      </div>
+      <div class="em-product-info">
+        <p class="em-eyebrow">EDGEMESH {{ product.title | upcase | escape }}</p>
+        <h1>{% render 'edgemesh-product-copy', handle: handle, field: 'headline' %}</h1>
+        <p class="em-lead">{% render 'edgemesh-product-copy', handle: handle, field: 'summary' %}</p>
+        <div class="em-product-price"><strong>{% if product.price == 0 %}Free{% else %}{{ product.price | money_without_trailing_zeros }}{% endif %}</strong><span>{% if product.price > 0 %}/ month{% else %}for qualified brands{% endif %}</span></div>
+        <p class="em-terms">{% render 'edgemesh-product-copy', handle: handle, field: 'terms' %}</p>
+        {% render 'edgemesh-buy-button', product: product, form_id: form_id, section_id: section.id %}
+        {% render 'edgemesh-product-copy', handle: handle, field: 'features' %}
+        <details class="em-description"><summary>Service details & demo terms</summary><div>{{ product.description }}</div></details>
+        <a class="em-text-link" href="https://edgemesh.com/{{ handle }}/">Learn more at Edgemesh.com {% render 'edgemesh-icon', name: 'arrow-up-right' %}</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{"name":"Edgemesh product","settings":[]}
+{% endschema %}

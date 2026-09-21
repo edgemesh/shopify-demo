@@ -1,0 +1,21 @@
+{% doc %}
+  Horizon's native product form, shared by the demo cards and product detail.
+  @param {product} product - The Shopify product.
+  @param {string} form_id - A unique form identifier.
+  @param {string} section_id - The containing section ID.
+{% enddoc %}
+<product-form-component
+  data-section-id="{{ section_id }}"
+  data-product-id="{{ product.id }}"
+  data-product-url="{{ product.url }}"
+  data-quantity-default="1"
+  on:submit="/handleSubmit"
+>
+  <div class="visually-hidden" aria-live="polite" role="status" ref="liveRegion"></div>
+  {% form 'product', product, id: form_id, data-type: 'add-to-cart-form' %}
+    <input type="hidden" name="id" ref="variantId" value="{{ product.selected_or_first_available_variant.id }}">
+    <input type="hidden" name="quantity" value="1">
+    <span class="em-form-error hidden" ref="addToCartTextError"></span>
+    {% render 'add-to-cart-button', product: product, can_add_to_cart: product.available, add_to_cart_text: 'Add to demo cart', class: 'em-button em-add-button', show_icon: false %}
+  {% endform %}
+</product-form-component>

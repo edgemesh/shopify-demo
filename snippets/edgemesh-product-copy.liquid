@@ -1,0 +1,43 @@
+{% doc %}
+  Marketing copy extracted from the EdgeMesh marketing repository on 2026-09-20.
+  @param {string} handle - The product handle.
+  @param {string} field - The content field.
+{% enddoc %}
+{% case handle %}
+{% when 'security' %}
+{% case field %}
+{% when 'summary' %}Protect your storefront and keep automated noise out of your business metrics.
+{% when 'headline' %}Block the bots. Keep your store’s data real.
+{% when 'terms' %}For qualified brands
+{% when 'asset' %}edgemesh-security-v2.webp
+{% when 'imageAlt' %}Violet glass and aluminum shield filtering incoming particles, illustrating Edgemesh Security
+{% when 'features' %}<ul class="em-features"><li>{% render 'edgemesh-icon', name: 'check' %}Bot and invalid traffic filtering</li><li>{% render 'edgemesh-icon', name: 'check' %}Verified crawler acceleration</li><li>{% render 'edgemesh-icon', name: 'check' %}Geographic traffic controls</li><li>{% render 'edgemesh-icon', name: 'check' %}AI assistant guidance</li></ul>
+{% endcase %}
+{% when 'signal' %}
+{% case field %}
+{% when 'summary' %}See the full ecommerce funnel with first-party data captured at the source.
+{% when 'headline' %}The funnel-focused analytics engine.
+{% when 'terms' %}For qualified brands
+{% when 'asset' %}edgemesh-signal-v2.webp
+{% when 'imageAlt' %}A glass waveform passing through a violet and aluminum aperture, illustrating Edgemesh Signal
+{% when 'features' %}<ul class="em-features"><li>{% render 'edgemesh-icon', name: 'check' %}Server-side, first-party measurement</li><li>{% render 'edgemesh-icon', name: 'check' %}Conversion and checkout funnels</li><li>{% render 'edgemesh-icon', name: 'check' %}Attribution against store revenue</li><li>{% render 'edgemesh-icon', name: 'check' %}Plain-language analysis</li></ul>
+{% endcase %}
+{% when 'performance' %}
+{% case field %}
+{% when 'summary' %}Deliver a faster Shopify storefront from the edge and measure the lift on real visitors.
+{% when 'headline' %}The fastest Shopify experience on the market.
+{% when 'terms' %}Per domain · Cancel anytime
+{% when 'asset' %}edgemesh-performance-v2.webp
+{% when 'imageAlt' %}A layered edge processor carrying bright violet light paths, illustrating Edgemesh Performance
+{% when 'features' %}<ul class="em-features"><li>{% render 'edgemesh-icon', name: 'check' %}Global edge delivery</li><li>{% render 'edgemesh-icon', name: 'check' %}Real-user speed measurement</li><li>{% render 'edgemesh-icon', name: 'check' %}Media and script optimization</li><li>{% render 'edgemesh-icon', name: 'check' %}Storefront downtime fallback</li></ul>
+{% endcase %}
+{% when 'allocation' %}
+{% case field %}
+{% when 'summary' %}Manage paid media like a portfolio, with daily execution and a target we stand behind.
+{% when 'headline' %}We put our money where our math is.
+{% when 'terms' %}Per domain · Month-to-month
+{% when 'asset' %}edgemesh-allocation-v2.webp
+{% when 'imageAlt' %}Three rising stacks of violet glass and metal tiles, illustrating Edgemesh Allocation
+{% when 'features' %}<ul class="em-features"><li>{% render 'edgemesh-icon', name: 'check' %}Meta and Google management</li><li>{% render 'edgemesh-icon', name: 'check' %}Daily pacing and reallocation</li><li>{% render 'edgemesh-icon', name: 'check' %}First-party measurement</li><li>{% render 'edgemesh-icon', name: 'check' %}Monthly performance guarantee</li></ul>
+{% endcase %}
+{% endcase %}

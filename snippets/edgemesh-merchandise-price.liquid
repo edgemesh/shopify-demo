@@ -1,0 +1,12 @@
+{% doc %}
+  Resolve storefront prices and sale messaging for a merchandise card.
+  @param {variant} variant - Cheapest available sampled variant, or the product default.
+{% enddoc %}
+<div class="em-merch-price">
+  <strong>{{ variant.price | money }}</strong>
+  {%- if variant.compare_at_price > variant.price -%}
+    {%- assign saving = variant.compare_at_price | minus: variant.price -%}
+    <span>Save {{ saving | money }}</span>
+  {%- endif -%}
+</div>
+{%- unless variant.title == 'Default Title' -%}<p>For {{ variant.title | escape }}</p>{%- endunless -%}

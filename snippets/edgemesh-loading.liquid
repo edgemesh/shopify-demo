@@ -1,0 +1,8 @@
+{% doc %}
+  Accessible loading indicator with reduced-motion support.
+  @param {string} [label] - Screen-reader loading message.
+{% enddoc %}
+<span class="em-loading" role="status">
+  {% render 'edgemesh-icon', name: 'loader-circle', class: 'em-spinner' %}
+  <span class="visually-hidden">{{ label | default: 'Measuring…' | escape }}</span>
+</span>

@@ -1,0 +1,82 @@
+[
+  {
+    "handle": "security",
+    "title": "Security",
+    "price": "0.00",
+    "descriptionHtml": "<p>Edgemesh filters bots and invalid traffic at the front door to your store before they reach your analytics, ad audiences, or conversion rate. Everything downstream is measured on real shoppers.</p><ul><li>Bot and invalid traffic filtering</li><li>Verified crawler acceleration</li><li>Geographic traffic controls</li><li>AI assistant guidance</li></ul><p>For qualified brands</p><p>Security and Signal are free for Shopify and Shopify Plus brands doing $25M or more in annual gross merchandise value.</p><p>Demo product. Service pricing is shown for illustration; adding this item does not activate a service or recurring billing.</p>",
+    "summary": "Protect your storefront and keep automated noise out of your business metrics.",
+    "headline": "Block the bots. Keep your store’s data real.",
+    "features": [
+      "Bot and invalid traffic filtering",
+      "Verified crawler acceleration",
+      "Geographic traffic controls",
+      "AI assistant guidance"
+    ],
+    "terms": "For qualified brands",
+    "asset": "edgemesh-security-v2.webp",
+    "imageUrl": "https://demo.edgemesh.com/cdn/shop/t/4/assets/edgemesh-security-v2.webp?v=1903294630929945701789961027",
+    "imageAlt": "Violet glass and aluminum shield filtering incoming particles, illustrating Edgemesh Security",
+    "source": "https://edgemesh.com/security/",
+    "marketingImageUrl": "https://edgemesh.com/icon-512x512.png"
+  },
+  {
+    "handle": "signal",
+    "title": "Signal",
+    "price": "0.00",
+    "descriptionHtml": "<p>First-party data on your own store: see what&#x27;s working, what isn&#x27;t, and where your funnel needs a change of direction. With the Edgemesh MCP, you can ask questions in plain language to the AI tools that you already use.</p><ul><li>Server-side, first-party measurement</li><li>Conversion and checkout funnels</li><li>Attribution against store revenue</li><li>Plain-language analysis</li></ul><p>For qualified brands</p><p>Security and Signal are free for Shopify and Shopify Plus brands doing $25M or more in annual gross merchandise value.</p><p>Demo product. Service pricing is shown for illustration; adding this item does not activate a service or recurring billing.</p>",
+    "summary": "See the full ecommerce funnel with first-party data captured at the source.",
+    "headline": "The funnel-focused analytics engine.",
+    "features": [
+      "Server-side, first-party measurement",
+      "Conversion and checkout funnels",
+      "Attribution against store revenue",
+      "Plain-language analysis"
+    ],
+    "terms": "For qualified brands",
+    "asset": "edgemesh-signal-v2.webp",
+    "imageUrl": "https://demo.edgemesh.com/cdn/shop/t/4/assets/edgemesh-signal-v2.webp?v=37742687228485181201789961027",
+    "imageAlt": "A glass waveform passing through a violet and aluminum aperture, illustrating Edgemesh Signal",
+    "source": "https://edgemesh.com/signal/",
+    "marketingImageUrl": "https://edgemesh.com/assets/hero-chart-engagement.png"
+  },
+  {
+    "handle": "performance",
+    "title": "Performance",
+    "price": "3950.00",
+    "descriptionHtml": "<p>You move fast, and your site should too. Get meaningful performance gains without re-engineering your store, with results backed by real-user data.</p><ul><li>Global edge delivery</li><li>Real-user speed measurement</li><li>Media and script optimization</li><li>Storefront downtime fallback</li></ul><p>Per domain · Cancel anytime</p><p>Demo product. Service pricing is shown for illustration; adding this item does not activate a service or recurring billing.</p>",
+    "summary": "Deliver a faster Shopify storefront from the edge and measure the lift on real visitors.",
+    "headline": "The fastest Shopify experience on the market.",
+    "features": [
+      "Global edge delivery",
+      "Real-user speed measurement",
+      "Media and script optimization",
+      "Storefront downtime fallback"
+    ],
+    "terms": "Per domain · Cancel anytime",
+    "asset": "edgemesh-performance-v2.webp",
+    "imageUrl": "https://demo.edgemesh.com/cdn/shop/t/4/assets/edgemesh-performance-v2.webp?v=99402353731402574371789961027",
+    "imageAlt": "A layered edge processor carrying bright violet light paths, illustrating Edgemesh Performance",
+    "source": "https://edgemesh.com/performance/",
+    "marketingImageUrl": "https://edgemesh.com/assets/performance-ttfb.png"
+  },
+  {
+    "handle": "allocation",
+    "title": "Allocation",
+    "price": "7500.00",
+    "descriptionHtml": "<p>Accurate first-party data plus a team that built high-frequency trading systems lets Edgemesh manage Meta and Google like an investment portfolio: measured, paced, and reallocated daily.</p><ul><li>Meta and Google management</li><li>Daily pacing and reallocation</li><li>First-party measurement</li><li>Monthly performance guarantee</li></ul><p>Per domain · Month-to-month</p><p>Once full management begins, if we miss the monthly benchmark, that month’s fee is on us.</p><p>Demo product. Service pricing is shown for illustration; adding this item does not activate a service or recurring billing.</p>",
+    "summary": "Manage paid media like a portfolio, with daily execution and a target we stand behind.",
+    "headline": "We put our money where our math is.",
+    "features": [
+      "Meta and Google management",
+      "Daily pacing and reallocation",
+      "First-party measurement",
+      "Monthly performance guarantee"
+    ],
+    "terms": "Per domain · Month-to-month",
+    "asset": "edgemesh-allocation-v2.webp",
+    "imageUrl": "https://demo.edgemesh.com/cdn/shop/t/4/assets/edgemesh-allocation-v2.webp?v=72286945054899063561789961027",
+    "imageAlt": "Three rising stacks of violet glass and metal tiles, illustrating Edgemesh Allocation",
+    "source": "https://edgemesh.com/allocation/",
+    "marketingImageUrl": "https://edgemesh.com/assets/allocation-hero.png"
+  }
+]

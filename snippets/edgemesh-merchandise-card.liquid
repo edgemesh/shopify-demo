@@ -1,0 +1,38 @@
+{% doc %}
+  A real catalog-card render, deliberately invoked repeatedly by the demo workload.
+  @param {product} product - Product from the selected collection.
+  @param {variant[]} variants - Bounded variant sample to evaluate.
+{% enddoc %}
+{%- liquid
+  assign available_variants = variants | where: 'available', true
+  assign sorted_variants = available_variants | sort: 'price'
+  assign cheapest_variant = sorted_variants | first | default: product.selected_or_first_available_variant
+  assign subtitle = product.metafields.descriptors.subtitle.value | default: product.description | strip_html | strip | truncate: 110
+  assign benefits = product.metafields.custom.benefits.value
+-%}
+<article class="em-merch-card">
+  {%- if product.featured_image -%}
+    {{ product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', widths: '200, 400', sizes: '(max-width: 600px) 100vw, 280px', class: 'em-merch-image' }}
+  {%- endif -%}
+  <div class="em-merch-body">
+    <p class="em-merch-vendor">{{ product.vendor | escape }}</p>
+    <h3><a href="{{ product.url }}">{{ product.title | escape }}</a></h3>
+    <p>{{ subtitle | escape }}</p>
+    {% render 'edgemesh-merchandise-price', variant: cheapest_variant %}
+    {% render 'edgemesh-merchandise-badges', product: product %}
+    {%- if benefits != blank -%}
+      <ul>{%- for benefit in benefits limit: 4 -%}<li>{{ benefit | escape }}</li>{%- endfor -%}</ul>
+    {%- endif -%}
+    <details class="em-merch-variants">
+      <summary>{{ available_variants.size }} of {{ variants.size }} sampled variants available</summary>
+      <ul>
+        {%- for variant in variants -%}
+          <li>
+            <span>{{ variant.options | join: ' / ' | escape }}</span>
+            <span>{{ variant.price | money }} · {% if variant.available %}Available{% else %}Sold out{% endif %}</span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </details>
+  </div>
+</article>

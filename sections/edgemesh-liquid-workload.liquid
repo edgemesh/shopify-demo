@@ -1,0 +1,91 @@
+{%- comment -%}
+  Deliberately repeat real merchandising renders to model a larger store with
+  this small demo catalog. Captures execute on Shopify; only four samples are
+  emitted. Keep this outside dynamic fragments and cart sections so an edge hit
+  can reuse the completed page. Never derive this workload from cart/customer.
+{%- endcomment -%}
+{%- if section.settings.enabled -%}
+  {%- liquid
+    assign source_collection = section.settings.collection | default: collections.all
+    assign source_products = source_collection.products
+    assign catalog_size = source_products.size | at_most: 48
+    assign passes = section.settings.passes | default: 16 | at_least: 1 | at_most: 32
+    assign slots = section.settings.slots | default: 48 | at_least: 8 | at_most: 48
+    assign sampled_products = catalog_size | at_most: slots
+    assign card_count = 0
+    assign variant_checks = 0
+    assign sample_cards = ''
+    assign rendered_characters = 0
+  -%}
+  {%- if catalog_size > 0 -%}
+    {%- for pass in (1..passes) -%}
+      {%- for slot in (1..slots) -%}
+        {%- liquid
+          assign product_index = slot | minus: 1 | modulo: catalog_size
+          assign candidate = source_products[product_index]
+          assign variants = candidate.variants | sort: 'price' | slice: 0, 24
+          assign variant_checks = variant_checks | plus: variants.size
+          assign card_count = card_count | plus: 1
+        -%}
+        {%- capture card -%}
+          {%- render 'edgemesh-merchandise-card', product: candidate, variants: variants -%}
+        {%- endcapture -%}
+        {%- liquid
+          assign rendered_characters = rendered_characters | plus: card.size
+          if pass == 1 and slot <= 4 and slot <= catalog_size
+            assign sample_cards = sample_cards | append: card
+          endif
+        -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- endif -%}
+  <section
+    class="em-liquid-section"
+    aria-labelledby="em-liquid-title-{{ section.id }}"
+    data-em-liquid-cards="{{ card_count }}"
+    data-em-liquid-variants="{{ variant_checks }}"
+    data-em-liquid-characters="{{ rendered_characters }}"
+  >
+    <div class="em-container">
+      <div class="em-section-heading">
+        <div>
+          <p class="em-eyebrow">{% render 'edgemesh-icon', name: 'server' %} ORIGIN RENDERING</p>
+          <h2 id="em-liquid-title-{{ section.id }}">The work behind<br>a cache miss.</h2>
+        </div>
+        <p>Collections, variants, prices, badges, and product metafields. Shopify assembles them in Liquid before the page can be delivered.</p>
+      </div>
+      <div class="em-liquid-panel">
+        <dl class="em-liquid-stats">
+          <div><dt>Product card renders</dt><dd>{{ card_count }}</dd></div>
+          <div><dt>Variant checks</dt><dd>{{ variant_checks }}</dd></div>
+          <div><dt>Products sampled</dt><dd>{{ sampled_products }}</dd></div>
+        </dl>
+        {%- if catalog_size > 0 -%}
+          <p class="em-liquid-note"><strong>Store-scale demo workload.</strong> {{ passes }} passes × {{ slots }} merchandising slots reuse this store’s catalog. Each card is rendered on Shopify; only the samples below are sent to your browser. An EdgeMesh page-cache hit can reuse the completed HTML.</p>
+          <details class="em-liquid-inspect">
+            <summary>Inspect the rendered catalog <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-up-right' %}</span></summary>
+            <div class="em-merch-grid">{{ sample_cards }}</div>
+            <p>Prices and availability come from the selected collection. Variant previews are limited to 24 per product.</p>
+          </details>
+        {%- else -%}
+          <p class="em-liquid-note">No published products are available in the selected collection. Choose a collection in the theme editor to run the workload.</p>
+        {%- endif -%}
+      </div>
+      <p class="em-liquid-hint">Use the cache switch above to compare delivery paths. Workload intensity is configurable in the theme editor.</p>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Liquid rendering workload",
+  "settings": [
+    {"type": "checkbox", "id": "enabled", "label": "Enable server rendering workload", "default": true},
+    {"type": "collection", "id": "collection", "label": "Source collection", "info": "Uses all products when empty. Samples the first 48 products."},
+    {"type": "range", "id": "passes", "label": "Merchandising passes", "min": 1, "max": 32, "step": 1, "default": 16},
+    {"type": "range", "id": "slots", "label": "Product slots per pass", "min": 8, "max": 48, "step": 8, "default": 48},
+    {"type": "paragraph", "content": "Demo only: repeats actual product-card Liquid to model a larger catalog. More passes increase origin work. Only four sample cards reach the browser. Edge cache hits can reuse the HTML. Disable to measure a baseline."}
+  ],
+  "presets": [{"name": "Liquid rendering workload"}]
+}
+{% endschema %}

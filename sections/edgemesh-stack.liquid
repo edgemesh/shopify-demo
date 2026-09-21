@@ -1,0 +1,60 @@
+<section class="em-stack-section" id="stack" aria-labelledby="em-stack-title">
+  <div class="em-container">
+    <div class="em-section-heading">
+      <div><p class="em-eyebrow">THE EDGEMESH STACK</p><h2 id="em-stack-title">Four layers. One platform.</h2></div>
+      <p>Security keeps it clean. Signal measures it.<br>Performance makes it fast. Allocation invests in it.</p>
+    </div>
+    <div class="em-product-grid">
+      {% for block in section.blocks %}
+        {% liquid
+          assign handle = block.settings.handle
+          assign demo_product = all_products[handle]
+          case handle
+            when 'security'
+              assign product_icon = 'shield-check'
+            when 'signal'
+              assign product_icon = 'chart-no-axes-combined'
+            when 'performance'
+              assign product_icon = 'gauge'
+            when 'allocation'
+              assign product_icon = 'target'
+          endcase
+          assign form_id = 'em-form-' | append: section.id | append: '-' | append: block.id
+        %}
+        {% capture asset %}{% render 'edgemesh-product-copy', handle: handle, field: 'asset' %}{% endcapture %}
+        {% capture image_alt %}{% render 'edgemesh-product-copy', handle: handle, field: 'imageAlt' %}{% endcapture %}
+        {% assign asset = asset | strip %}
+        <article class="em-product-card" {{ block.shopify_attributes }}>
+          <a class="em-product-art em-product-illustration" href="{% if demo_product != blank %}{{ demo_product.url }}?view=edgemesh{% else %}https://edgemesh.com/{{ handle }}/{% endif %}" aria-label="Explore {{ handle | capitalize }}">
+            <span class="em-product-index">0{{ forloop.index }}</span>
+            <img src="{{ asset | asset_url }}" width="1254" height="1254" alt="{{ image_alt | strip | escape }}" loading="lazy">
+            <span class="em-art-label">{% case handle %}{% when 'security' %}CLEAN TRAFFIC{% when 'signal' %}HONEST NUMBERS{% when 'performance' %}GLOBAL EDGE DELIVERY{% when 'allocation' %}MEASURED GROWTH{% endcase %}</span>
+          </a>
+          <div class="em-product-body">
+            <div class="em-product-title"><h3>{{ handle | capitalize }}</h3>{% render 'edgemesh-icon', name: product_icon, class: 'em-product-capability-icon' %}</div>
+            <p class="em-product-summary">{% render 'edgemesh-product-copy', handle: handle, field: 'summary' %}</p>
+            <div class="em-product-price">
+              {% if demo_product != blank %}
+                <strong>{% if demo_product.price == 0 %}Free{% else %}{{ demo_product.price | money_without_trailing_zeros }}{% endif %}</strong>
+              {% else %}
+                <strong>{% case handle %}{% when 'performance' %}$3,950{% when 'allocation' %}$7,500{% else %}Free{% endcase %}</strong>
+              {% endif %}
+              <span>{% if handle == 'performance' or handle == 'allocation' %}/ month{% else %}for qualified brands{% endif %}</span>
+            </div>
+            {% if demo_product != blank %}
+              {% render 'edgemesh-buy-button', product: demo_product, form_id: form_id, section_id: section.id %}
+              <a class="em-product-details" href="{{ demo_product.url }}?view=edgemesh">Explore {{ handle | capitalize }} <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-right' %}</span></a>
+            {% else %}
+              <button class="em-button em-add-button" disabled>Product setup pending</button>
+              <a class="em-product-details" href="https://edgemesh.com/{{ handle }}/">Explore {{ handle | capitalize }} {% render 'edgemesh-icon', name: 'arrow-up-right' %}</a>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+    <div class="em-stack-note">{% render 'edgemesh-icon', name: 'info', class: 'em-note-icon' %}<p>This is a demo store. Prices reflect Edgemesh services; cart items do not activate a service or subscription. Security and Signal are free for Shopify brands with $25M+ annual GMV.</p></div>
+  </div>
+</section>
+{% schema %}
+{"name":"Edgemesh product stack","settings":[],"max_blocks":4,"blocks":[{"type":"product","name":"Stack product","settings":[{"type":"text","id":"handle","label":"Product handle","default":"security"}]}],"presets":[{"name":"Edgemesh product stack","blocks":[{"type":"product","settings":{"handle":"security"}},{"type":"product","settings":{"handle":"signal"}},{"type":"product","settings":{"handle":"performance"}},{"type":"product","settings":{"handle":"allocation"}}]}]}
+{% endschema %}

@@ -1,0 +1,8 @@
+catalog/*
+docs/*
+scripts/*
+tests/*
+README.md
+UPSTREAM.md
+package.json
+package-lock.json
