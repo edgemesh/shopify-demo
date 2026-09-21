@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { navigationMetrics, documentResponseTiming, cacheToggleUrl, cacheOutcome, formatMilliseconds } from '../assets/edgemesh-metrics.js';
+import { navigationMetrics, documentResponseTiming, cacheToggleUrl, cacheOutcome, isLikelyFreshLiquidRender, liquidRenderAge, formatMilliseconds } from '../assets/edgemesh-metrics.js';
 
 test('reports distinct navigation milestones and waits for load to finish', () => {
   const nav = { startTime: 0, requestStart: 35, responseStart: 135, responseEnd: 155, loadEventEnd: 700 };
@@ -68,7 +68,7 @@ test('prefers authoritative navigation cache status to potentially cached HTML c
   assert.deepEqual(cacheOutcome(nav, { schemaVersion: 1, cache: { status: 'hit', level: 'L1' } }), { status: 'hit', label: 'HIT · L0', source: 'Server-Timing' });
   assert.equal(cacheOutcome({ serverTiming: [{ name: 'edgemesh-cache', description: 'BYPASS' }] }).status, 'bypass');
 });
-test('uses known EdgeMesh config and never invents a hit from another CDN', () => {
+test('uses known Edgemesh config and never invents a hit from another CDN', () => {
   assert.equal(cacheOutcome(null, { schemaVersion: 1, cache: { status: 'miss' } }).label, 'MISS');
   assert.equal(cacheOutcome({ serverTiming: [{ name: 'cfCacheStatus', description: 'HIT' }] }).label, 'Not reported');
   assert.equal(cacheOutcome({ serverTiming: [{ name: 'edgemesh-cache', description: 'HIT;T9' }] }).status, 'unknown');
@@ -80,7 +80,7 @@ test('recognizes the deployed worker’s legacy cache timing before HTML configu
     { name: 'ems-cache-hit', description: '[EM] Cache Hit' },
   ] };
   assert.deepEqual(cacheOutcome(navigation, { schemaVersion: 1, cache: { status: 'miss' } }), {
-    status: 'hit', label: 'HIT', source: 'EdgeMesh Server-Timing (ems-cache-hit)',
+    status: 'hit', label: 'HIT', source: 'Edgemesh Server-Timing (ems-cache-hit)',
   });
   const miss = cacheOutcome({ serverTiming: [{ name: 'ems-cache-miss', description: '[EM] Cache Miss' }] });
   assert.equal(miss.label, 'MISS');
@@ -100,4 +100,64 @@ test('formats valid zeroes and never turns missing or nonfinite values into zero
   assert.deepEqual(formatMilliseconds(0), { value: '0', unit: 'ms' });
   assert.deepEqual(formatMilliseconds(1350), { value: '1.35', unit: 's' });
   for (const value of [null, undefined, NaN, Infinity, -1]) assert.equal(formatMilliseconds(value), null);
+});
+
+test('fresh-render inference accepts either high TTFB or a recent response timestamp', () => {
+  const options = { bypassed: true, renderedAt: '1700000000', receivedAtMs: 1700000042000 };
+  const nav = { startTime: 0, requestStart: 10, responseStart: 40, finalResponseHeadersStart: 700 };
+  assert.equal(isLikelyFreshLiquidRender(nav, options), true);
+  assert.equal(isLikelyFreshLiquidRender({ ...nav, finalResponseHeadersStart: 699 }, options), false);
+  const fast = { ...nav, finalResponseHeadersStart: 100 };
+  assert.equal(isLikelyFreshLiquidRender(fast, { ...options, receivedAtMs: 1700000005000 }), true);
+  assert.equal(isLikelyFreshLiquidRender(fast, { ...options, receivedAtMs: 1700000005001 }), false);
+  assert.equal(isLikelyFreshLiquidRender(fast, { ...options, receivedAtMs: 1700000000000 }), true);
+});
+
+test('fresh-render inference is disabled for enabled cache, cache hits, and history restores', () => {
+  const options = { bypassed: true, renderedAt: '1700000000', receivedAtMs: 1700000001000 };
+  const nav = { startTime: 0, requestStart: 10, finalResponseHeadersStart: 1000 };
+  assert.equal(isLikelyFreshLiquidRender(nav, { ...options, bypassed: false }), false);
+  assert.equal(isLikelyFreshLiquidRender(nav, { ...options, restoredFromHistory: true }), false);
+  assert.equal(isLikelyFreshLiquidRender({ ...nav, deliveryType: 'cache' }, options), false);
+  assert.equal(isLikelyFreshLiquidRender({ ...nav, serverTiming: [{ name: 'ems-cache-hit' }] }, options), false);
+  assert.equal(isLikelyFreshLiquidRender(nav, { ...options, cache: { status: 'hit' } }), false);
+});
+
+test('missing or future timestamps cannot qualify as recent, but high TTFB still stands alone', () => {
+  const options = { bypassed: true, receivedAtMs: 1700000000000 };
+  const fast = { startTime: 0, requestStart: 10, finalResponseHeadersStart: 100 };
+  for (const renderedAt of [undefined, '', 'invalid', '1700000001']) {
+    assert.equal(isLikelyFreshLiquidRender(fast, { ...options, renderedAt }), false);
+    assert.equal(isLikelyFreshLiquidRender({ ...fast, finalResponseHeadersStart: 900 }, { ...options, renderedAt }), true);
+  }
+  assert.equal(isLikelyFreshLiquidRender(undefined, options), false);
+  assert.equal(isLikelyFreshLiquidRender(fast, { bypassed: true, renderedAt: '1700000000' }), false);
+});
+
+test('Liquid timestamp age is approximate across seconds, minutes, hours, and days', () => {
+  const renderedAt = '1700000000';
+  for (const [elapsed, label] of [[0, '<1s'], [0.9, '<1s'], [42, '≈42s'], [59.9, '≈59s'], [60, '≈1m'], [3599, '≈59m'], [3600, '≈1h'], [86400, '≈1d']]) {
+    const result = liquidRenderAge(renderedAt, (1700000000 + elapsed) * 1000);
+    assert.equal(result.label, `Liquid rendered ${label} ago`);
+    assert.equal(result.status, 'timestamp');
+    assert.equal(result.timestamp, '2023-11-14T22:13:20.000Z');
+    assert.equal(result.ageSeconds, elapsed);
+    assert.match(result.detail, /approximate/);
+  }
+});
+
+test('invalid or missing Liquid timestamps cannot look like a recent render', () => {
+  for (const value of [null, undefined, '', ' ', 'bad', '0', '-1', '1700000000.5', '1e9', '9999999999999999', '9999999999999']) {
+    const result = liquidRenderAge(value, 1700000042000);
+    assert.equal(result.status, 'unknown');
+    assert.equal(result.label, 'Liquid render age unavailable');
+  }
+  assert.equal(liquidRenderAge('1700000000', NaN).status, 'unknown');
+});
+
+test('a timestamp ahead of the browser clock is flagged instead of clamped to fresh', () => {
+  const result = liquidRenderAge('1700000001', 1700000000000);
+  assert.equal(result.status, 'unknown');
+  assert.equal(result.label, 'Liquid render clock difference');
+  assert.match(result.detail, /ahead of your device clock/);
 });

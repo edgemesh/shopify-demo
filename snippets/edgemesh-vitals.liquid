@@ -3,7 +3,10 @@
     <div class="em-vitals-inner">
       <div class="em-vitals-heading">
         <strong>{% render 'edgemesh-icon', name: 'server' %} SERVER VITALS</strong>
-        <span class="em-vitals-caption">Measured in your browser</span>
+        <div class="em-vitals-meta">
+          <span class="em-vitals-caption">Measured in your browser</span>
+          <span class="em-liquid-render-status" data-em-liquid-render data-em-rendered-at="{{ 'now' | date: '%s' }}" aria-live="off" hidden></span>
+        </div>
       </div>
       <dl class="em-vitals-grid">
         <div><dt title="Navigation start to the final document response; excludes interim responses such as HTTP 103 Early Hints">{% render 'edgemesh-icon', name: 'timer' %}<span data-em-ttfb-label>TTFB</span></dt><dd data-em-vital="ttfb" aria-busy="true">{% render 'edgemesh-loading' %}</dd></div>
@@ -22,6 +25,7 @@
       </div>
     </div>
     <div id="em-vitals-about" class="em-vitals-about" data-em-vitals-about role="region" aria-label="How to read these numbers" hidden>
+      <p data-em-liquid-render-note>Checking when Liquid last rendered this page…</p>
       <p>TTFB measures from navigation start to the actual document response, including redirects and connection setup. Early Hints can arrive much earlier. Compare REQ TIME with the main document’s “Waiting for server response (TTFB)” in DevTools; our reading also includes sending the request because browsers do not expose that end timestamp to page scripts. RES TIME starts at the final document headers, so the wait after Early Hints is not counted as download time.</p>
       <p data-em-response-timing-note>Checking the browser’s document timing support…</p>
       <dl class="em-timing-breakdown" aria-label="Document timing milestones from navigation start">
@@ -31,7 +35,7 @@
         <div><dt>Document response finished</dt><dd data-em-vital="response-end" aria-busy="true">{% render 'edgemesh-loading' %}</dd></div>
       </dl>
       <p>These milestones all start at navigation. Full load ends at the browser’s load event, before later lazy-loaded content. TTI is an immediate estimate based on DOM readiness, first contentful paint, and long tasks observed through page load. It does not wait for the legacy five-second quiet window or verify network quiet; “N/A” means this browser cannot measure it. These are page-load timings, not all server processing times or Google Core Web Vitals.</p>
-      <p>Cache status comes from this navigation’s EdgeMesh Server-Timing entry or embedded runtime configuration. “Not reported” means no cache outcome was exposed. Disable cache adds <code>em-bypass=all</code> and reloads; enable cache removes it and reloads. This parameter bypasses all EdgeMesh optimizations, so this compares the complete EdgeMesh delivery path. Other URL parameters are preserved.</p>
+      <p>Cache status comes from this navigation’s Edgemesh Server-Timing entry or embedded runtime configuration. “Not reported” means no cache outcome was exposed. Disable cache adds <code>em-bypass=all</code> and reloads; enable cache removes it and reloads. This parameter bypasses Edgemesh optimizations but does not disable Shopify’s own HTML cache. A cache miss here does not guarantee a new Liquid render. Other URL parameters are preserved.</p>
     </div>
     <p class="em-vitals-bfcache" data-em-history-note hidden>Restored from browser history. Reload this page for a new timing measurement.</p>
     <template id="em-stat-loading-template">{% render 'edgemesh-loading' %}</template>

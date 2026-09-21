@@ -22,7 +22,7 @@ function element(text = '') {
   };
 }
 
-function fixture({ tti, readyState = 'interactive' } = {}) {
+function fixture({ tti, readyState = 'interactive', renderedAt, href = 'https://demo.example/?preview_theme_id=123', navOverrides = {} } = {}) {
   const stats = new Map(['ttfb', 'request', 'response', 'load', 'tti', 'request-start', 'first-response', 'final-headers', 'response-end'].map(name => {
     const stat = element('Measuring');
     stat.setAttribute('aria-busy', 'true');
@@ -34,6 +34,9 @@ function fixture({ tti, readyState = 'interactive' } = {}) {
   button.append(label); button.append(icon);
   button.querySelector = () => label;
   const cache = element('Checking');
+  const liquidStatus = element('Checking');
+  if (renderedAt !== undefined) liquidStatus.setAttribute('data-em-rendered-at', renderedAt);
+  const liquidNote = element();
   const aboutToggle = element();
   aboutToggle.setAttribute('aria-expanded', 'false');
   const about = element();
@@ -41,30 +44,37 @@ function fixture({ tti, readyState = 'interactive' } = {}) {
   const script = element();
   const nodes = new Map([
     ['[data-em-cache-toggle]', button], ['[data-em-cache-status]', cache],
+    ['[data-em-liquid-render]', liquidStatus], ['[data-em-liquid-render-note]', liquidNote],
     ['[data-em-ttfb-label]', element()], ['[data-em-response-timing-note]', element()],
     ['[data-em-history-note]', element()],
     ['[data-em-vitals-about-toggle]', aboutToggle], ['[data-em-vitals-about]', about],
   ]);
-  const nav = { startTime: 0, requestStart: 10, responseStart: 40, finalResponseHeadersStart: 500, responseEnd: 520, loadEventEnd: 0 };
+  const nav = { startTime: 0, requestStart: 10, responseStart: 40, finalResponseHeadersStart: 500, responseEnd: 520, loadEventEnd: 0, ...navOverrides };
   const listeners = new Map();
   const locations = [];
+  const intervals = [];
+  let now = 1700000042000;
   const context = vm.createContext({
     ...metrics, URL, setTimeout,
-    performance: { getEntriesByType: () => [nav] },
+    Date: { now: () => now },
+    setInterval: (handler, delay) => intervals.push({ handler, delay }),
+    performance: { getEntriesByType: () => [nav], timeOrigin: 1700000041480 },
     window: {
       edgemeshTti: tti,
-      location: { href: 'https://demo.example/?preview_theme_id=123', assign: value => locations.push(value) },
+      location: { href, assign: value => locations.push(value) },
       addEventListener: (name, handler) => listeners.set(name, handler),
     },
     document: {
       readyState,
+      visibilityState: 'visible',
+      addEventListener: (name, handler) => listeners.set(name, handler),
       querySelector: selector => stats.get(selector.match(/^\[data-em-vital="(.+)"\]$/)?.[1]) || nodes.get(selector) || null,
       getElementById: id => id === 'em-tti-script' ? script : { content: { cloneNode: () => element('Measuring') } },
       createTextNode: text => element(text), createElement: () => element(),
     },
   });
   vm.runInContext(source, context);
-  return { stats, button, icon, label, cache, aboutToggle, about, nav, listeners, locations, script, run: code => vm.runInContext(code, context) };
+  return { stats, button, icon, label, cache, liquidStatus, liquidNote, aboutToggle, about, nav, listeners, locations, script, intervals, advance: ms => { now += ms; }, run: code => vm.runInContext(code, context) };
 }
 
 test('timing explanation expands and collapses with its accessible toggle state', () => {
@@ -126,6 +136,82 @@ test('history restore clears pending state and ignores a later TTI result', asyn
     assert.equal(stat.textContent, '—');
     assert.equal(stat.attributes.get('aria-busy'), 'false');
   }
+  assert.equal(f.liquidStatus.hidden, true);
+  assert.equal(f.liquidStatus.textContent, '');
+  assert.match(f.liquidNote.textContent, /Restored from browser history/);
+});
+
+test('render age is only in the collapse, with no freshness label while cache is enabled', () => {
+  const f = fixture({ renderedAt: '1700000040', navOverrides: { finalResponseHeadersStart: 900 } });
+  assert.equal(f.liquidStatus.hidden, true);
+  assert.equal(f.liquidStatus.textContent, '');
+  assert.equal(f.liquidStatus.attributes.get('aria-busy'), 'false');
+  assert.match(f.liquidNote.textContent, /^Liquid rendered ≈2s ago\./);
+  assert.doesNotMatch(f.liquidNote.textContent, /Likely fresh render/);
+  assert.equal(f.liquidNote.title, 'Liquid timestamp: 2023-11-14T22:14:00.000Z');
+  const partialBypass = fixture({ renderedAt: '1700000040', href: 'https://demo.example/?em-bypass=cache' });
+  assert.equal(partialBypass.liquidStatus.hidden, true);
+});
+
+test('disabled cache and slow TTFB show a qualified fresh-render label, even with an older timestamp', () => {
+  const f = fixture({ renderedAt: '1700000000', href: 'https://demo.example/?em-bypass=all', navOverrides: { finalResponseHeadersStart: 900 } });
+  assert.equal(f.liquidStatus.hidden, false);
+  assert.equal(f.liquidStatus.textContent, 'Likely fresh render');
+  assert.equal(f.liquidStatus.dataset.state, 'rendered');
+  assert.match(f.liquidNote.textContent, /^Liquid rendered ≈42s ago\./);
+  assert.match(f.liquidNote.textContent, /This is an estimate/);
+});
+
+test('a recent timestamp qualifies at response time and the label persists as the displayed age increases', () => {
+  const f = fixture({ renderedAt: '1700000040', href: 'https://demo.example/?em-bypass=all' });
+  assert.equal(f.liquidStatus.hidden, false);
+  assert.equal(f.liquidStatus.textContent, 'Likely fresh render');
+  assert.equal(f.intervals.length, 1);
+  f.advance(60000);
+  f.intervals[0].handler();
+  assert.equal(f.liquidStatus.textContent, 'Likely fresh render');
+  assert.equal(f.liquidStatus.hidden, false);
+  assert.match(f.liquidNote.textContent, /^Liquid rendered ≈1m ago\./);
+  assert.equal(f.locations.length, 0);
+});
+
+test('fast responses with older timestamps show Possibly stale despite retained Server-Timing', () => {
+  const f = fixture({ renderedAt: '1700000000', href: 'https://demo.example/?em-bypass=all', navOverrides: { serverTiming: [{ name: 'render', duration: 1200 }] } });
+  assert.equal(f.liquidStatus.hidden, false);
+  assert.equal(f.liquidStatus.textContent, 'Possibly stale');
+  assert.equal(f.liquidStatus.dataset.state, 'unconfirmed');
+  assert.match(f.liquidNote.textContent, /^Liquid rendered ≈42s ago\./);
+  assert.match(f.liquidNote.textContent, /not proof of outdated content/);
+});
+
+test('bypassed cache hits show Possibly stale while history restores hide the label', () => {
+  for (const navOverrides of [{ deliveryType: 'cache' }, { serverTiming: [{ name: 'ems-cache-hit' }] }]) {
+    const f = fixture({ renderedAt: '1700000040', href: 'https://demo.example/?em-bypass=all', navOverrides });
+    assert.equal(f.liquidStatus.hidden, false);
+    assert.equal(f.liquidStatus.textContent, 'Possibly stale');
+    assert.match(f.liquidNote.textContent, /^Liquid rendered ≈2s ago\./);
+  }
+  const f = fixture({ renderedAt: '1700000040', href: 'https://demo.example/?em-bypass=all' });
+  assert.equal(f.liquidStatus.hidden, false);
+  f.advance(18000);
+  f.listeners.get('pageshow')({ persisted: true });
+  assert.equal(f.liquidStatus.hidden, true);
+  assert.equal(f.liquidStatus.textContent, '');
+  assert.match(f.liquidNote.textContent, /^Liquid rendered ≈20s ago\./);
+  assert.match(f.liquidNote.textContent, /Restored from browser history/);
+  assert.equal(f.liquidStatus.getAttribute('data-em-rendered-at'), '1700000040');
+});
+
+test('the collapsed render age catches up when a background tab becomes visible', () => {
+  const f = fixture({ renderedAt: '1700000000' });
+  f.run('document.visibilityState = "hidden"');
+  f.advance(3600000);
+  f.intervals[0].handler();
+  assert.match(f.liquidNote.textContent, /^Liquid rendered ≈42s ago\./);
+  f.run('document.visibilityState = "visible"');
+  f.listeners.get('visibilitychange')();
+  assert.match(f.liquidNote.textContent, /^Liquid rendered ≈1h ago\./);
+  assert.equal(f.liquidStatus.hidden, true);
 });
 
 test('cache navigation preserves the icon and shows busy state until the page leaves', () => {

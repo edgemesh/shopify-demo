@@ -2,7 +2,7 @@ import { morphSection } from '@theme/section-renderer';
 import { StandardEvents } from '@shopify/events';
 
 // The commerce flow belongs to Horizon. This module refreshes the cacheable
-// drawer shell, asks the installed EdgeMesh runtime to expand its fragments,
+// drawer shell, asks the installed Edgemesh runtime to expand its fragments,
 // and reports observed activity in the demo panel.
 const cartSection = 'cart-drawer-section';
 let mutationsInFlight = 0;
@@ -29,7 +29,7 @@ function describeEnvironment() {
   status(
     '[data-em-fragment-status]',
     runtime()
-      ? 'EdgeMesh runtime detected · waiting for fragment markup'
+      ? 'Edgemesh runtime detected · waiting for fragment markup'
       : 'Shopify preview · native count updates; edge runtime not detected'
   );
 }
@@ -134,7 +134,7 @@ function init() {
     new MutationObserver(() => {
       if (!runtime() || !fragment.querySelector('cart-icon')) return;
       fragmentUpdates += 1;
-      status('[data-em-fragment-status]', `EdgeMesh inserted fresh fragment markup · ${fragmentUpdates} refresh${fragmentUpdates === 1 ? '' : 'es'}`, 'success');
+      status('[data-em-fragment-status]', `Edgemesh inserted fresh fragment markup · ${fragmentUpdates} refresh${fragmentUpdates === 1 ? '' : 'es'}`, 'success');
     }).observe(fragment, { childList: true });
   }
   describeEnvironment();

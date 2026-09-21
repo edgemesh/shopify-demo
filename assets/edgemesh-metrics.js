@@ -35,8 +35,8 @@ export function cacheToggleUrl(href) {
 }
 
 export function cacheOutcome(navigation, config) {
-  // Support both EdgeMesh worker contracts; other CDNs' HIT headers are
-  // not evidence of an EdgeMesh cache hit. Prefer navigation timing over HTML
+  // Support both Edgemesh worker contracts; other CDNs' HIT headers are
+  // not evidence of an Edgemesh cache hit. Prefer navigation timing over HTML
   // configuration because the service worker may have supplied an L0 response.
   const entries = Array.from(navigation?.serverTiming || []).reverse();
   const timing = entries.find((entry) => entry.name.toLowerCase() === 'edgemesh-cache');
@@ -52,15 +52,51 @@ export function cacheOutcome(navigation, config) {
     return {
       status: hit ? 'hit' : 'miss',
       label: hit ? 'HIT' : 'MISS',
-      source: hit ? 'EdgeMesh Server-Timing (ems-cache-hit)' : 'EdgeMesh Server-Timing (ems-cache-miss; also reported for bypassed requests)',
+      source: hit ? 'Edgemesh Server-Timing (ems-cache-hit)' : 'Edgemesh Server-Timing (ems-cache-miss; also reported for bypassed requests)',
     };
   }
   const cache = config?.cache;
   if (config?.schemaVersion === 1 && ['hit', 'miss', 'bypass', 'revalidated'].includes(cache?.status)) {
     const level = cache.status === 'hit' && ['L0', 'L1', 'L2'].includes(cache.level) ? ` · ${cache.level}` : '';
-    return { status: cache.status, label: cache.status.toUpperCase() + level, source: 'EdgeMesh runtime configuration' };
+    return { status: cache.status, label: cache.status.toUpperCase() + level, source: 'Edgemesh runtime configuration' };
   }
-  return { status: 'unknown', label: 'Not reported', source: 'No EdgeMesh cache outcome exposed for this navigation' };
+  return { status: 'unknown', label: 'Not reported', source: 'No Edgemesh cache outcome exposed for this navigation' };
+}
+
+export function isLikelyFreshLiquidRender(navigation, {
+  bypassed = false, restoredFromHistory = false, renderedAt, receivedAtMs,
+  cache = cacheOutcome(navigation),
+} = {}) {
+  if (!bypassed || restoredFromHistory || navigation?.deliveryType === 'cache' || cache.status === 'hit') return false;
+  const ttfb = navigationMetrics(navigation).ttfb;
+  const age = liquidRenderAge(renderedAt, receivedAtMs ?? NaN);
+  return (Number.isFinite(ttfb) && ttfb >= 700) || (age.ageSeconds !== null && age.ageSeconds <= 5);
+}
+
+export function liquidRenderAge(renderedAt, nowMs = Date.now()) {
+  const seconds = typeof renderedAt === 'string' && /^\d+$/.test(renderedAt) ? Number(renderedAt) : NaN;
+  const renderedMs = seconds * 1000;
+  if (!Number.isSafeInteger(seconds) || seconds <= 0 || !Number.isFinite(nowMs) || !Number.isFinite(new Date(renderedMs).getTime())) {
+    return {
+      status: 'unknown', label: 'Liquid render age unavailable', ageSeconds: null, timestamp: null,
+      detail: 'This page has no valid Liquid timestamp.',
+    };
+  }
+  const timestamp = new Date(renderedMs).toISOString();
+  const elapsed = (nowMs - renderedMs) / 1000;
+  if (elapsed < 0) {
+    return {
+      status: 'unknown', label: 'Liquid render clock difference', ageSeconds: null, timestamp,
+      detail: 'The Liquid timestamp is ahead of your device clock.',
+    };
+  }
+  const age = elapsed < 1 ? '<1s' : elapsed < 60 ? `≈${Math.floor(elapsed)}s`
+    : elapsed < 3600 ? `≈${Math.floor(elapsed / 60)}m`
+      : elapsed < 86400 ? `≈${Math.floor(elapsed / 3600)}h` : `≈${Math.floor(elapsed / 86400)}d`;
+  return {
+    status: 'timestamp', label: `Liquid rendered ${age} ago`, ageSeconds: elapsed, timestamp,
+    detail: 'Age is approximate and uses your device clock.',
+  };
 }
 
 export function formatMilliseconds(value) {

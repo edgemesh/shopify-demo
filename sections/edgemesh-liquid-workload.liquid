@@ -1,7 +1,7 @@
 {%- comment -%}
   Deliberately repeat real merchandising renders to model a larger store with
-  this small demo catalog. Captures execute on Shopify; only four samples are
-  emitted. Keep this outside dynamic fragments and cart sections so an edge hit
+  this small demo catalog. Captures execute on Shopify; their output is counted,
+  not emitted. Keep this outside dynamic fragments and cart sections so an edge hit
   can reuse the completed page. Never derive this workload from cart/customer.
 {%- endcomment -%}
 {%- if section.settings.enabled -%}
@@ -11,10 +11,13 @@
     assign catalog_size = source_products.size | at_most: 48
     assign passes = section.settings.passes | default: 16 | at_least: 1 | at_most: 32
     assign slots = section.settings.slots | default: 48 | at_least: 8 | at_most: 48
-    assign sampled_products = catalog_size | at_most: slots
+    assign integrations = section.settings.integrations | default: 1 | at_least: 0 | at_most: 2
+    if integrations > 0
+      assign max_passes = 1536 | divided_by: slots | divided_by: integrations
+      assign passes = passes | at_most: max_passes
+    endif
     assign card_count = 0
     assign variant_checks = 0
-    assign sample_cards = ''
     assign rendered_characters = 0
   -%}
   {%- if catalog_size > 0 -%}
@@ -30,12 +33,15 @@
         {%- capture card -%}
           {%- render 'edgemesh-merchandise-card', product: candidate, variants: variants -%}
         {%- endcapture -%}
-        {%- liquid
-          assign rendered_characters = rendered_characters | plus: card.size
-          if pass == 1 and slot <= 4 and slot <= catalog_size
-            assign sample_cards = sample_cards | append: card
-          endif
-        -%}
+        {%- if integrations > 0 -%}
+          {%- for integration in (1..integrations) -%}
+            {%- capture integration_payload -%}
+              {%- render 'edgemesh-merchandise-integrations', product: candidate, variants: variants, catalog: source_products -%}
+            {%- endcapture -%}
+            {%- assign rendered_characters = rendered_characters | plus: integration_payload.size -%}
+          {%- endfor -%}
+        {%- endif -%}
+        {%- assign rendered_characters = rendered_characters | plus: card.size -%}
       {%- endfor -%}
     {%- endfor -%}
   {%- endif -%}
@@ -45,33 +51,41 @@
     data-em-liquid-cards="{{ card_count }}"
     data-em-liquid-variants="{{ variant_checks }}"
     data-em-liquid-characters="{{ rendered_characters }}"
+    data-em-liquid-integrations="{{ card_count | times: integrations }}"
   >
     <div class="em-container">
       <div class="em-section-heading">
         <div>
-          <p class="em-eyebrow">{% render 'edgemesh-icon', name: 'server' %} ORIGIN RENDERING</p>
-          <h2 id="em-liquid-title-{{ section.id }}">The work behind<br>a cache miss.</h2>
+          <p class="em-eyebrow">{% render 'edgemesh-icon', name: 'server' %} HOW THIS DEMO WORKS</p>
+          <h2 id="em-liquid-title-{{ section.id }}">A fast foundation.<br>A real store’s workload.</h2>
         </div>
-        <p>Collections, variants, prices, badges, and product metafields. Shopify assembles them in Liquid before the page can be delivered.</p>
+        <p>Shopify’s Horizon theme is a performant starting point. As a storefront grows, apps, merchandising rules, and richer product data add work. This demo models the extra Liquid processing those features can introduce.</p>
       </div>
       <div class="em-liquid-panel">
-        <dl class="em-liquid-stats">
-          <div><dt>Product card renders</dt><dd>{{ card_count }}</dd></div>
-          <div><dt>Variant checks</dt><dd>{{ variant_checks }}</dd></div>
-          <div><dt>Products sampled</dt><dd>{{ sampled_products }}</dd></div>
-        </dl>
-        {%- if catalog_size > 0 -%}
-          <p class="em-liquid-note"><strong>Store-scale demo workload.</strong> {{ passes }} passes × {{ slots }} merchandising slots reuse this store’s catalog. Each card is rendered on Shopify; only the samples below are sent to your browser. An EdgeMesh page-cache hit can reuse the completed HTML.</p>
-          <details class="em-liquid-inspect">
-            <summary>Inspect the rendered catalog <span aria-hidden="true">{% render 'edgemesh-icon', name: 'arrow-up-right' %}</span></summary>
-            <div class="em-merch-grid">{{ sample_cards }}</div>
-            <p>Prices and availability come from the selected collection. Variant previews are limited to 24 per product.</p>
-          </details>
-        {%- else -%}
-          <p class="em-liquid-note">No published products are available in the selected collection. Choose a collection in the theme editor to run the workload.</p>
-        {%- endif -%}
+        <div class="em-liquid-simulation">
+          <h3>Real Liquid work, simulated store complexity.</h3>
+          {%- if catalog_size > 0 -%}
+            <p>We reuse this small catalog to run a bounded set of product, variant, pricing, and metafield operations{% if integrations > 0 %}, plus app-style processing for reviews, related products, and structured data{% endif %}. The work runs on Shopify, without artificial delays or third-party apps. Repeated output stays on the server, so the comparison measures processing rather than an oversized page.</p>
+          {%- else -%}
+            <p>The simulation is ready, but the selected collection has no published products. Choose a populated collection in the theme editor to run the Liquid workload.</p>
+          {%- endif -%}
+        </div>
+        <div class="em-liquid-paths">
+          <div>
+            <h3>Fresh Liquid render</h3>
+            <p>When Shopify executes the Liquid template, it assembles the theme and store data into a freshly rendered page. That HTML is returned from Shopify, the origin behind this demo. More Liquid work means more time before the page is ready.</p>
+          </div>
+          <div>
+            <h3>Shopify HTML cache</h3>
+            <p>Shopify can reuse previously rendered HTML to save that work. The origin response may contain an older snapshot that does not yet reflect a recent change. Shopify manages freshness and invalidation automatically; this Liquid theme has no direct controls for its cache lifetime or purging.</p>
+          </div>
+          <div>
+            <h3>Edgemesh edge cache</h3>
+            <p>An Edgemesh hit serves the page from our edge without a round trip to Shopify. This can be faster even than fetching Shopify-cached HTML. Edgemesh adds cache controls while dynamic fragments and Shopify’s Section Rendering API keep visitor-specific content, like the cart, current.</p>
+          </div>
+        </div>
       </div>
-      <p class="em-liquid-hint">Use the cache switch above to compare delivery paths. Workload intensity is configurable in the theme editor.</p>
+      <p class="em-liquid-hint">Use Server Vitals to compare these delivery paths. Open “How to read these numbers” to see when Liquid last rendered this HTML. Disabling Edgemesh keeps Shopify’s own cache in place; the fresh-render indicator is an estimate based on response time and the Liquid timestamp.</p>
     </div>
   </section>
 {%- endif -%}
@@ -84,7 +98,8 @@
     {"type": "collection", "id": "collection", "label": "Source collection", "info": "Uses all products when empty. Samples the first 48 products."},
     {"type": "range", "id": "passes", "label": "Merchandising passes", "min": 1, "max": 32, "step": 1, "default": 16},
     {"type": "range", "id": "slots", "label": "Product slots per pass", "min": 8, "max": 48, "step": 8, "default": 48},
-    {"type": "paragraph", "content": "Demo only: repeats actual product-card Liquid to model a larger catalog. More passes increase origin work. Only four sample cards reach the browser. Edge cache hits can reuse the HTML. Disable to measure a baseline."}
+    {"type": "range", "id": "integrations", "label": "App-style integrations per slot", "min": 0, "max": 2, "step": 1, "default": 1},
+    {"type": "paragraph", "content": "Demo only: repeats actual product-card and app-style Liquid. App renders are capped at 1,536 per page; passes are reduced when needed. Repeated output stays on the server. Shopify and Edgemesh can reuse cached HTML. Disable to measure a baseline."}
   ],
   "presets": [{"name": "Liquid rendering workload"}]
 }

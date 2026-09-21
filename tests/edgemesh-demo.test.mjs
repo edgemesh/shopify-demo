@@ -71,7 +71,7 @@ test('failed section requests do not replace the cart or claim success', async (
   assert.equal(f.statuses.get('[data-em-section-status]').dataset.state, 'error');
 });
 
-test('Shopify previews report that no EdgeMesh runtime was detected', async () => {
+test('Shopify previews report that no Edgemesh runtime was detected', async () => {
   const f = fixture(async () => sectionResponse());
   await f.run('refreshFragments()');
   assert.match(f.statuses.get('[data-em-fragment-status]').textContent, /not detected/);

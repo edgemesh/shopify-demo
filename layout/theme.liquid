@@ -1,3 +1,20 @@
+{%- comment -%}
+  Model stores that assemble app/catalog output before sending their document.
+  Resolve the demo template before emitting the head so its real Liquid work
+  contributes to final-response TTFB instead of a gap in Shopify's HTML stream.
+  Both delivery paths use this same template; metric calculations are unchanged.
+{%- endcomment -%}
+{%- liquid
+  assign buffer_demo_page = false
+  if template.name == 'index'
+    assign buffer_demo_page = true
+  elsif template.name == 'product' and template.suffix == 'edgemesh'
+    assign buffer_demo_page = true
+  endif
+-%}
+{%- if buffer_demo_page -%}
+  {%- capture em_rendered_page -%}{{ content_for_layout }}{%- endcapture -%}
+{%- endif -%}
 <!doctype html>
 <html
   {% if request.design_mode %}
@@ -170,7 +187,11 @@
         data-product-transition="{{ settings.transition_to_main_product }}"
         data-template="{{ template }}"
       >
-        {{ content_for_layout }}
+        {%- if buffer_demo_page -%}
+          {{ em_rendered_page }}
+        {%- else -%}
+          {{ content_for_layout }}
+        {%- endif -%}
       </main>
 
       <footer>

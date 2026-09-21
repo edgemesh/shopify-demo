@@ -13,7 +13,8 @@
       "settings": {
         "enabled": true,
         "passes": 16,
-        "slots": 48
+        "slots": 48,
+        "integrations": 1
       }
     }
   },

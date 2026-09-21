@@ -1,0 +1,51 @@
+{% doc %}
+  Model independent app integrations preparing catalog data on Shopify.
+  This renders real product data; it does not load apps or make network calls.
+  @param {product} product - Product being merchandised.
+  @param {variant[]} variants - Bounded variant sample.
+  @param {product[]} catalog - Bounded catalog for related-product rules.
+{% enddoc %}
+{%- liquid
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value
+  assign searchable_description = product.description | strip_html | strip_newlines | strip
+  assign search_terms = product.title | append: ' ' | append: product.vendor | append: ' ' | append: product.type | append: ' ' | append: searchable_description | downcase | split: ' ' | uniq | sort
+  assign ordered_variants = variants | sort: 'price'
+  assign available_variants = ordered_variants | where: 'available', true
+  assign related_products = catalog | where: 'available', true | sort: 'price'
+-%}
+<div data-em-integration-product="{{ product.id }}">
+  <dl>
+    <dt>Review rating</dt><dd>{{ rating.rating | default: 'Not rated' | escape }}</dd>
+    <dt>Review count</dt><dd>{{ rating_count | default: 0 }}</dd>
+    <dt>Search terms</dt><dd>{{ search_terms | join: ' ' | escape }}</dd>
+    <dt>Available variants</dt><dd>{{ available_variants.size }}</dd>
+  </dl>
+  <ul>
+    {%- for variant in ordered_variants -%}
+      <li data-variant-id="{{ variant.id }}">
+        {{ variant.title | escape }} / {{ variant.sku | escape }} / {{ variant.price | money_with_currency }}
+        {% render 'edgemesh-merchandise-price', variant: variant %}
+        {{ variant.metafields.custom.delivery_message.value | escape }}
+        {%- for option in variant.options -%}<span>{{ option | escape }}</span>{%- endfor -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+  <ul>
+    {%- for related in related_products limit: 12 -%}
+      {%- unless related.id == product.id -%}
+        {%- liquid
+          assign related_variants = related.variants | sort: 'price' | slice: 0, 24
+          assign available_related_variants = related_variants | where: 'available', true
+          assign related_variant = available_related_variants | first | default: related.selected_or_first_available_variant
+        -%}
+        <li>
+          <a href="{{ related.url }}">{{ related.title | escape }}</a>
+          {% render 'edgemesh-merchandise-price', variant: related_variant %}
+          {% render 'edgemesh-merchandise-badges', product: related %}
+        </li>
+      {%- endunless -%}
+    {%- endfor -%}
+  </ul>
+  <pre>{{ product | structured_data | escape }}</pre>
+</div>

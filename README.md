@@ -1,6 +1,6 @@
 # Edgemesh Shopify demo
 
-A Shopify Horizon theme for **edgemesh.myshopify.com**, whose primary storefront is **demo.edgemesh.com**. The slate/violet design, Inter and Geist Mono fonts, service descriptions, and pricing come from the adjacent EdgeMesh marketing repository. Product artwork is a coordinated set of custom 3D illustrations, and the hero uses the supplied EdgeMesh dashboard screenshot.
+A Shopify Horizon theme for **edgemesh.myshopify.com**, whose primary storefront is **demo.edgemesh.com**. The slate/violet design, Inter and Geist Mono fonts, service descriptions, and pricing come from the adjacent Edgemesh marketing repository. Product artwork is a coordinated set of custom 3D illustrations, and the hero uses the supplied Edgemesh dashboard screenshot.
 
 The review theme is **Edgemesh Demo — Horizon**, ID **153508675674**. It is unpublished.
 

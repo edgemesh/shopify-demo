@@ -104,7 +104,7 @@ class CartIcon extends Component {
    * Checks if the cart count is correct.
    */
   ensureCartBubbleIsCorrect = () => {
-    // EdgeMesh owns the initial count; never replace freshly expanded markup
+    // Edgemesh owns the initial count; never replace freshly expanded markup
     // with a previous page's session-storage snapshot.
     if (this.closest('[data-em-cart-fragment]')) return;
     // Ensure refs are available
