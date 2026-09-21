@@ -29,6 +29,7 @@ export function navigationMetrics(navigation) {
 
 export function cacheToggleUrl(href) {
   const url = new URL(href);
+  url.hash = '';
   if (url.searchParams.getAll('em-bypass').includes('all')) url.searchParams.delete('em-bypass');
   else url.searchParams.set('em-bypass', 'all');
   return url;

@@ -49,15 +49,15 @@ test('navigation setup remains distinct from request wait and zero-duration tran
   };
   assert.deepEqual(navigationMetrics(nav), { ttfb: 600, request: 100, response: 0, load: 800 });
 });
-test('cache control preserves path, locale, preview, variants, other parameters and hash', () => {
-  const url = 'https://demo.edgemesh.com/fr/products/signal?preview_theme_id=123&variant=456&utm_source=demo#details';
-  const off = cacheToggleUrl(url);
+test('cache control clears anchors while preserving path, locale, preview, variants and other parameters', () => {
+  const url = 'https://demo.edgemesh.com/fr/products/signal?preview_theme_id=123&variant=456&utm_source=demo';
+  const off = cacheToggleUrl(`${url}#details`);
   assert.equal(off.searchParams.get('em-bypass'), 'all');
   assert.equal(off.searchParams.get('preview_theme_id'), '123');
   assert.equal(off.searchParams.get('variant'), '456');
   assert.equal(off.pathname, '/fr/products/signal');
-  assert.equal(off.hash, '#details');
-  assert.equal(cacheToggleUrl(off.href).href, url);
+  assert.equal(off.hash, '');
+  assert.equal(cacheToggleUrl(`${off.href}#details`).href, url);
 });
 test('cache control normalizes partial and duplicate bypass parameters', () => {
   assert.equal(cacheToggleUrl('https://demo.edgemesh.com/?em-bypass=cache').searchParams.get('em-bypass'), 'all');
