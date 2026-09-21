@@ -5,6 +5,7 @@ import { debounce, isDesktopBreakpoint, mediaQueryLarge, yieldToMainThread } fro
 import { SlideshowSelectEvent } from '@theme/events';
 import { morph } from '@theme/morph';
 import { StandardEvents, ProductSelectEvent } from '@shopify/events';
+import { preserveCacheBypass } from '@edgemesh/navigation';
 
 /**
  * @typedef {object} ProductCardLinkRefs
@@ -176,16 +177,17 @@ export class ProductCard extends ProductCardLink {
    * @param {URL} url - The URL to navigate to.
    */
   #navigateToURL = (event, url) => {
+    const href = preserveCacheBypass(url.href);
     // Check for modifier keys that should open in new tab/window (only for mouse events)
     const shouldOpenInNewTab =
       event instanceof MouseEvent && (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1);
 
     if (shouldOpenInNewTab) {
       event.preventDefault();
-      window.open(url.href, '_blank');
+      window.open(href, '_blank');
       return;
     } else {
-      window.location.href = url.href;
+      window.location.href = href;
     }
   };
 

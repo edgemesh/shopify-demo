@@ -2,10 +2,10 @@
 
 A Shopify Horizon theme for **edgemesh.myshopify.com**, whose primary storefront is **demo.edgemesh.com**. The slate/violet design, Inter and Geist Mono fonts, service descriptions, and pricing come from the adjacent Edgemesh marketing repository. Product artwork is a coordinated set of custom 3D illustrations, and the hero uses the supplied Edgemesh dashboard screenshot.
 
-The review theme is **Edgemesh Demo — Horizon**, ID **153508675674**. It is unpublished.
+The live theme is **Edgemesh Demo — Horizon**, ID **153508675674**.
 
 - [Preview](https://edgemesh.myshopify.com/?preview_theme_id=153508675674)
-- [Direct Shopify preview](https://edgemesh.myshopify.com/?_fd=0&pb=0&preview_theme_id=153508675674) for checking the origin when the custom domain is unavailable. Navigation and cart requests can still redirect to the primary domain.
+- [Shopify preview](https://edgemesh.myshopify.com/?_fd=0&pb=0&preview_theme_id=153508675674) for checking the theme when the custom domain is unavailable. Navigation and cart requests can still redirect to the primary domain.
 - [Theme editor](https://edgemesh.myshopify.com/admin/themes/153508675674/editor)
 
 ## Shopify CLI
@@ -18,7 +18,11 @@ npm run dev
 npm run push
 ```
 
-The `demo` environment in `shopify.theme.toml` targets only the unpublished theme. These commands do not publish it as the live theme.
+The `demo` environment in `shopify.theme.toml` targets the live theme. Deployments require `npm run push -- --allow-live` and update the storefront immediately.
+
+The repository is the source of truth for theme code and theme settings. Normal deployments include `config/settings_data.json`, applying the checked-in favicon, logos, custom CSS, app embeds, and other theme-editor settings to live. The push command uses `--nodelete` to retain remote files absent from the local checkout; files present locally, including theme settings, overwrite their live counterparts.
+
+If changes are made through the live theme editor or code editor, pull the affected files into a separate temporary directory, compare them with the repository, and sync the reviewed changes locally before the next deployment. Otherwise, deployment will restore the repository’s values. For Open Graph images, `snippets/meta-tags.liquid` uses Shopify’s [page_image](https://shopify.dev/docs/api/liquid/objects/page_image), which selects the page’s featured image or the store’s social sharing image; that store preference is separate from theme settings.
 
 ## Products
 
@@ -33,7 +37,7 @@ The `demo` environment in `shopify.theme.toml` targets only the unpublished them
 
 These are non-shipping demo products, with no subscription or service activation. Seeding requires a separate Shopify CLI store API connection; theme authentication alone does not grant product access.
 
-All four products were created through Shopify CLI and published to the Online Store on 2026-09-20. Their marketing images finished processing successfully. The direct Shopify preview resolves all four products; Performance was added at $3,950 and removed afterward to verify the product and price.
+All four products were created through Shopify CLI and published to the Online Store on 2026-09-20. Their marketing images finished processing successfully. The Shopify preview resolves all four products; Performance was added at $3,950 and removed afterward to verify the product and price.
 
 The current product artwork uses charcoal backgrounds, violet glass, and brushed metal: Security's shield, Signal's waveform aperture, Performance's edge processor, and Allocation's rising portfolio stacks. The built-in image generation tool produced the 1254 × 1254 PNG masters in `catalog/product-images/`; `prompts.json` records the full prompt set. Optimized `assets/edgemesh-*-v2.webp` files are 81–92 KB each. Square card and product-page layouts preserve the complete artwork. The original marketing assets remain available.
 

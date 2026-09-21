@@ -73,19 +73,19 @@
         <div class="em-liquid-paths">
           <div>
             <h3>Fresh Liquid render</h3>
-            <p>When Shopify executes the Liquid template, it assembles the theme and store data into a freshly rendered page. That HTML is returned from Shopify, the origin behind this demo. More Liquid work means more time before the page is ready.</p>
+            <p>When Shopify executes the Liquid template, it assembles the theme and store data into a freshly rendered page. More Liquid work means more processing before the page is ready.</p>
           </div>
           <div>
             <h3>Shopify HTML cache</h3>
-            <p>Shopify can reuse previously rendered HTML to save that work. The origin response may contain an older snapshot that does not yet reflect a recent change. Shopify manages freshness and invalidation automatically; this Liquid theme has no direct controls for its cache lifetime or purging.</p>
+            <p>Shopify can reuse previously rendered HTML to reduce rendering work. A cached response may reflect an earlier render. Shopify manages freshness and invalidation automatically; this theme has no direct controls for its cache lifetime or purging.</p>
           </div>
           <div>
             <h3>Edgemesh edge cache</h3>
-            <p>An Edgemesh hit serves the page from our edge without a round trip to Shopify. This can be faster even than fetching Shopify-cached HTML. Edgemesh adds cache controls while dynamic fragments and Shopify’s Section Rendering API keep visitor-specific content, like the cart, current.</p>
+            <p>Edgemesh reuses cached page content to help reduce load times. Server Vitals shows the measured cache outcome and timings for each page load. Dynamic fragments and Shopify’s Section Rendering API update visitor-specific content, such as the cart.</p>
           </div>
         </div>
       </div>
-      <p class="em-liquid-hint">Use Server Vitals to compare these delivery paths. Open “How to read these numbers” to see more details. Disabling Edgemesh cache sends requests direct to Shopify who may return their own cached response. The fresh-render indicator is an estimate based on response time and the Liquid timestamp.</p>
+      <p class="em-liquid-hint">Use Server Vitals to compare cache behavior and page timings. Open ‘How to read these numbers’ for more details. Disabling Edgemesh caching does not disable Shopify’s own caching. The fresh-render indicator is an estimate based on response time and the Liquid timestamp.</p>
     </div>
   </section>
 {%- endif -%}

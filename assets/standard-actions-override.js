@@ -1,3 +1,5 @@
+import { preserveCacheBypass } from '@edgemesh/navigation';
+
 /**
  * Horizon overrides for Shopify.actions:
  * - updateCart: emit events from the cart drawer scope.
@@ -20,7 +22,7 @@ function init() {
       if (drawer?.open) {
         drawer.open();
       } else {
-        window.location.href = Theme.routes.cart_url || '/cart';
+        window.location.href = preserveCacheBypass(Theme.routes.cart_url || '/cart');
       }
     },
   });

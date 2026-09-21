@@ -3,6 +3,7 @@ import { Component } from '@theme/component';
 import { debounce, mediaQueryLarge, startViewTransition } from '@theme/utilities';
 import { convertMoneyToMinorUnits, formatMoney } from '@theme/money-formatting';
 import { CollectionUpdateEvent, SearchUpdateEvent, StandardEvents } from '@shopify/events';
+import { preserveCacheBypass } from '@edgemesh/navigation';
 
 /**
  * Search query parameter.
@@ -92,7 +93,8 @@ class FacetsFormComponent extends Component {
       url.searchParams.append(param, value);
     }
 
-    history.pushState({ urlParameters: urlParameters.toString() }, '', url.toString());
+    const destination = new URL(preserveCacheBypass(url.toString()));
+    history.pushState({ urlParameters: destination.searchParams.toString() }, '', destination.toString());
   }
 
   /**
@@ -162,7 +164,7 @@ class FacetsFormComponent extends Component {
    * @param {string} url - The URL to update filters with
    */
   updateFiltersByURL(url) {
-    history.pushState('', '', url);
+    history.pushState('', '', preserveCacheBypass(url));
     const renderPromise = this.#updateSection();
     if (this.dataset.pageType === 'search') {
       this.#dispatchSearchUpdateEvent(renderPromise);

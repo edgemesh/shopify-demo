@@ -4,6 +4,7 @@ import { DialogComponent, DialogCloseEvent } from '@theme/dialog';
 import { mediaQueryLarge, isMobileBreakpoint, getIOSVersion } from '@theme/utilities';
 import VariantPicker from '@theme/variant-picker';
 import { StandardEvents, ProductSelectEvent, CartLinesUpdateEvent } from '@shopify/events';
+import { preserveCacheBypass } from '@edgemesh/navigation';
 
 export class QuickAddComponent extends Component {
   /** @type {AbortController | null} */
@@ -119,7 +120,7 @@ export class QuickAddComponent extends Component {
     const currentUrl = this.productPageUrl;
 
     if (this.dataset.usesSellingPlans === 'true') {
-      if (currentUrl) window.location.href = currentUrl;
+      if (currentUrl) window.location.href = preserveCacheBypass(currentUrl);
       return;
     }
 

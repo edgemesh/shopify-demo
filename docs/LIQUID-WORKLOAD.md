@@ -6,7 +6,7 @@ The default is **16 passes × 48 slots = 768 product-card renders**, plus **768 
 
 Each card resolves real variants, availability, prices, images, metafields, and tag badges through nested snippets. Each integration independently prepares review metadata, searchable product text, sorted variant prices/options, related-product merchandising, and Shopify structured product data. Missing review data stays unrated; no fabricated ratings or inventory are generated.
 
-Captured output is evaluated by Liquid. Product cards and integration payloads contribute to workload counters and are not sent to the browser. The visible section explains the simulation and the three delivery paths: fresh Liquid rendering, Shopify-managed HTML caching, and Edgemesh edge caching. The `variantChecks` counter counts the primary card variants, excluding the integration's additional related-product/variant work.
+Captured output is evaluated by Liquid. Product cards and integration payloads contribute to workload counters and are not sent to the browser. The visible section explains the simulation and three aspects of rendering and caching: fresh Liquid rendering, Shopify-managed HTML caching, and Edgemesh edge caching. The `variantChecks` counter counts the primary card variants, excluding the integration's additional related-product/variant work.
 
 ## Response buffering
 
@@ -76,6 +76,6 @@ References: [Shopify streamed HTML](https://shopify.dev/docs/storefronts/themes/
 
 ## Storefront explanation
 
-The section presents Horizon as a performant foundation and describes the additional Liquid work that richer storefronts can introduce. It distinguishes a freshly rendered page from an older cached snapshot, qualifies the latency benefit of avoiding a Shopify round trip, and describes cache lifetime/purge controls as unavailable to this Liquid theme rather than claiming Shopify has no invalidation mechanism. No universal speed or freshness guarantee is made.
+The section presents Horizon as a performant foundation and describes the additional Liquid work that richer storefronts can introduce. It distinguishes a freshly rendered page from previously rendered HTML and explains how Edgemesh reuses cached page content to help reduce load times. Server Vitals reports measured cache outcomes and page timings; dynamic fragments and Shopify’s Section Rendering API update visitor-specific content. Shopify manages its own cache freshness and invalidation automatically, and this theme has no direct controls for its cache lifetime or purging. Disabling Edgemesh caching does not disable Shopify’s own caching. The fresh-render indicator remains an estimate based on response time and the Liquid timestamp. No universal speed or freshness guarantee is made.
 
 Background: [Shopify’s full-page caching explanation](https://shopify.engineering/simplify-batch-cache-optimized-server-side-storefront-rendering), [Shopify’s theme performance guidance](https://shopify.dev/docs/storefronts/themes/best-practices/performance).

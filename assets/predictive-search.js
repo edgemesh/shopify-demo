@@ -5,6 +5,7 @@ import { morph } from '@theme/morph';
 import { RecentlyViewed } from '@theme/recently-viewed-products';
 import { DialogCloseEvent, DialogOpenEvent, DialogComponent } from '@theme/dialog';
 import { SearchUpdateEvent } from '@shopify/events';
+import { preserveCacheBypass } from '@edgemesh/navigation';
 
 /**
  * A custom element that allows the user to search for resources available on the store.
@@ -223,7 +224,7 @@ class PredictiveSearchComponent extends Component {
         const singleResultContainer = this.refs.predictiveSearchResults.querySelector('[data-single-result-url]');
         if (singleResultContainer instanceof HTMLElement && singleResultContainer.dataset.singleResultUrl) {
           event.preventDefault();
-          window.location.href = singleResultContainer.dataset.singleResultUrl;
+          window.location.href = preserveCacheBypass(singleResultContainer.dataset.singleResultUrl);
           return;
         }
 
@@ -233,7 +234,7 @@ class PredictiveSearchComponent extends Component {
         } else {
           const searchUrl = new URL(Theme.routes.search_url, location.origin);
           searchUrl.searchParams.set('q', this.refs.searchInput.value);
-          window.location.href = searchUrl.toString();
+          window.location.href = preserveCacheBypass(searchUrl.toString());
         }
         break;
       }

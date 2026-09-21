@@ -8,6 +8,7 @@
   {
     "imports": {
       "@edgemesh/metrics": "{{ 'edgemesh-metrics.js' | asset_url }}",
+      "@edgemesh/navigation": "{{ 'edgemesh-navigation.js' | asset_url }}",
       "@theme/overflow-list": "{{ 'overflow-list.js' | asset_url }}",
       "@theme/component": "{{ 'component.js' | asset_url }}",
       "@theme/dialog": "{{ 'dialog.js' | asset_url }}",
@@ -38,6 +39,11 @@
       "@theme/theme-drawer": "{{ 'theme-drawer.js' | asset_url }}"
     }
   }
+</script>
+
+<script type="module">
+  import { initCacheNavigation } from '@edgemesh/navigation';
+  initCacheNavigation();
 </script>
 
 {%- comment -%}
